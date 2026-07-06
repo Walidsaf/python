@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Encoding Explorer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script>
+      window.CONVERSIONS = {{ conversions | tojson }};
+    </script>
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="workspace" aria-labelledby="app-title">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Binary, ASCII, UTF-8</p>
+            <h1 id="app-title">Encoding Explorer</h1>
+          </div>
+          <button class="icon-button" id="themeToggle" type="button" aria-label="Toggle dark mode" title="Toggle dark mode">
+            <span aria-hidden="true">◐</span>
+          </button>
+        </header>
+
+        <div class="converter-panel">
+          <label class="field-label" for="conversionSelect">Conversion</label>
+          <select id="conversionSelect"></select>
+          <p class="hint" id="hintText"></p>
+
+          <label class="field-label" for="inputValue">Input</label>
+          <textarea id="inputValue" spellcheck="false"></textarea>
+
+          <div class="actions">
+            <button class="primary-button" id="convertButton" type="button">Convert</button>
+            <button id="exampleButton" type="button">Example</button>
+            <button id="clearButton" type="button">Clear</button>
+            <button id="copyButton" type="button">Copy Output</button>
+          </div>
+
+          <label class="field-label" for="outputValue">Output</label>
+          <textarea id="outputValue" readonly spellcheck="false"></textarea>
+          <p class="status" id="statusText" role="status"></p>
+        </div>
+      </section>
+
+      <aside class="history-panel" aria-labelledby="history-title">
+        <div class="history-heading">
+          <div>
+            <p class="eyebrow">Saved locally</p>
+            <h2 id="history-title">History</h2>
+          </div>
+          <button id="clearHistoryButton" type="button">Clear</button>
+        </div>
+        <div class="history-list" id="historyList"></div>
+        <p class="shortcut-note">Ctrl+Enter converts. Escape clears.</p>
+      </aside>
+    </main>
+
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+  </body>
+</html>

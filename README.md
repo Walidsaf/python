@@ -1,32 +1,111 @@
-# 🧮 Base Converter Tool
+# Encoding Explorer
 
-A clean Python utility script to convert numbers and text between different computing bases.
+A Python converter app for decimal, binary, ASCII, and UTF-8. It now runs as a desktop GUI, a terminal app, and a publishable web app.
 
-## 🚀 Features
-* **Decimal to Binary:** Converts whole numbers to structured binary strings.
-* **Binary to Decimal:** Parses binary inputs into integers with error checking.
-* **ASCII to Binary:** Encodes standard text characters into 8-bit bytes.
-* **Binary to ASCII:** Decodes 8-bit structured bytes back into human-readable text.
-* **GUI app:** Includes examples, copy output, keyboard shortcuts, and conversion history.
-* **Clean structure:** Conversion logic lives in `converter.py`, and the app entry point is `test.py`.
+## Features
+* Decimal, binary, ASCII, and UTF-8 conversions
+* Shared Python conversion engine in `converter.py`
+* Desktop GUI with examples, copy output, menu bar, dark mode, and saved history
+* Web app with HTML, CSS, JavaScript, dark mode, local history, and a Python API
+* Unit tests for the converter logic
 
-## 🛠️ Usage
-Run the GUI using Python 3:
+## Install
+Create and use the local virtual environment:
 ```bash
-python3 test.py
+python3 -m venv .venv
+.venv/bin/python -m pip install -r requirements.txt
 ```
 
-If Tkinter is missing, install it first:
+If the desktop GUI is missing Tkinter on Ubuntu/Debian:
 ```bash
 sudo apt install python3-tk
 ```
 
-You can still run the old terminal menu:
+## Run The Desktop App
 ```bash
-python3 test.py --cli
+python3 app.py
+```
+
+The old command still works:
+```bash
+python3 test.py
+```
+
+## Run The Terminal App
+```bash
+python3 app.py --cli
+```
+
+## Run The Web App
+```bash
+.venv/bin/python app.py --web
+```
+
+Then open:
+```text
+http://127.0.0.1:5000
+```
+
+You can also run the web server directly:
+```bash
+.venv/bin/python web_app.py
+```
+
+## Project Files
+* `app.py` - main launcher for desktop, terminal, and web modes
+* `test.py` - compatibility wrapper for the old run command
+* `converter.py` - shared conversion logic
+* `web_app.py` - Flask backend and API
+* `templates/index.html` - web page HTML
+* `static/styles.css` - web design
+* `static/app.js` - browser behavior connected to Python
+* `test_converter.py` - unit tests
+* `Procfile`, `render.yaml`, `wsgi.py` - deployment helpers
+
+## Web API
+The website connects to Python through:
+```text
+POST /api/convert
+```
+
+Example JSON body:
+```json
+{
+  "choice": "1",
+  "value": "42"
+}
+```
+
+Example response:
+```json
+{
+  "ok": true,
+  "result": "101010",
+  "conversion": {
+    "key": "1",
+    "label": "Decimal -> Binary",
+    "outputLabel": "Binary"
+  }
+}
+```
+
+## Publish
+For Render, this repo includes `render.yaml`. The start command is:
+```bash
+gunicorn web_app:app
+```
+
+For other Python hosts, use:
+```bash
+pip install -r requirements.txt
+gunicorn web_app:app
 ```
 
 ## Keyboard Shortcuts
-* **Ctrl+Enter:** Run the selected conversion.
-* **Escape:** Clear the current input and output.
-   
+* `Ctrl+Enter` converts
+* `Escape` clears
+
+## Tests
+```bash
+.venv/bin/python -m unittest
+```
