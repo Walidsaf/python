@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Encoding Explorer — Binary, ASCII & UTF-8 Converter</title>
+    <meta name="google-site-verification" content="eAd-L0zcls0rCKMD75jXM7rShIkIqUEqswG6NJh9wWE" />
+
+    <meta name="description" content="Free online tool to convert between binary, decimal, ASCII, and UTF-8 encodings instantly in your browser. No signup required.">
+    <link rel="canonical" href="https://citex.name.ng/">
+
+    <meta property="og:title" content="Encoding Explorer">
+    <meta property="og:description" content="Convert between binary, ASCII, and UTF-8 instantly.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://citex.name.ng/">
+
+    <meta name="theme-color" content="#f4f1ea" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#141817" media="(prefers-color-scheme: dark)">
+
+    <link rel="stylesheet" href="static/styles.css">
+    <script>
+      // Mirrors converter.py's CONVERSIONS tuple exactly (key, label, hint, example).
+      // Netlify serves this statically, so it can't run Jinja's {{ conversions | tojson }} —
+      // this hardcoded list must be kept in sync manually if converter.py ever changes.
+      window.CONVERSIONS = [
+        { key: "1",  label: "Decimal -> Binary",     hint: "Enter a non-negative whole number.",              example: "42" },
+        { key: "2",  label: "Binary -> Decimal",     hint: "Enter binary digits. Spaces and commas are allowed.", example: "101010" },
+        { key: "3",  label: "ASCII -> Binary",       hint: "Enter plain ASCII text.",                          example: "Hello" },
+        { key: "4",  label: "Binary -> ASCII",       hint: "Enter 8-bit binary bytes.",                        example: "01001000 01100101 01101100 01101100 01101111" },
+        { key: "5",  label: "ASCII -> UTF-8 bytes",  hint: "Enter ASCII text.",                                example: "Hello" },
+        { key: "6",  label: "UTF-8 bytes -> ASCII",  hint: "Enter decimal byte values from 0 to 127.",         example: "72 101 108 108 111" },
+        { key: "7",  label: "ASCII -> Decimal",      hint: "Enter ASCII text.",                                example: "ABC" },
+        { key: "8",  label: "Decimal -> ASCII",      hint: "Enter decimal character values.",                 example: "65 66 67" },
+        { key: "9",  label: "UTF-8 -> Decimal",      hint: "Enter any UTF-8 text.",                            example: "cafe" },
+        { key: "10", label: "Decimal -> UTF-8",      hint: "Enter decimal bytes or one code point.",           example: "195 169" }
+      ];
+    </script>
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="workspace" aria-labelledby="app-title">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Binary, ASCII, UTF-8</p>
+            <h1 id="app-title">Encoding Explorer</h1>
+          </div>
+          <button class="icon-button" id="themeToggle" type="button" aria-label="Toggle dark mode" title="Toggle dark mode">
+            <span aria-hidden="true">◐</span>
+          </button>
+        </header>
+
+        <div class="converter-panel">
+          <label class="field-label" for="conversionSelect">Conversion</label>
+          <select id="conversionSelect"></select>
+          <p class="hint" id="hintText"></p>
+
+          <label class="field-label" for="inputValue">Input</label>
+          <textarea id="inputValue" spellcheck="false"></textarea>
+
+          <div class="actions">
+            <button class="primary-button" id="convertButton" type="button">Convert</button>
+            <button id="exampleButton" type="button">Example</button>
+            <button id="clearButton" type="button">Clear</button>
+            <button id="copyButton" type="button">Copy Output</button>
+          </div>
+
+          <label class="field-label" for="outputValue">Output</label>
+          <textarea id="outputValue" readonly spellcheck="false"></textarea>
+          <p class="status" id="statusText" role="status"></p>
+        </div>
+      </section>
+
+      <aside class="history-panel" aria-labelledby="history-title">
+        <div class="history-heading">
+          <div>
+            <p class="eyebrow">Saved locally</p>
+            <h2 id="history-title">History</h2>
+          </div>
+          <button id="clearHistoryButton" type="button">Clear</button>
+        </div>
+        <div class="history-list" id="historyList"></div>
+        <p class="shortcut-note">Ctrl+Enter converts. Escape clears.</p>
+      </aside>
+    </main>
+
+    <script src="static/app.js"></script>
+  </body>
+</html>
