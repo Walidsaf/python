@@ -28,16 +28,25 @@
       // Netlify serves this statically, so it can't run Jinja's {{ conversions | tojson }} —
       // this hardcoded list must be kept in sync manually if converter.py ever changes.
       window.CONVERSIONS = [
-        { key: "1",  label: "Decimal -> Binary",     hint: "Enter a non-negative whole number.",              example: "42" },
-        { key: "2",  label: "Binary -> Decimal",     hint: "Enter binary digits. Spaces and commas are allowed.", example: "101010" },
-        { key: "3",  label: "ASCII -> Binary",       hint: "Enter plain ASCII text.",                          example: "Hello" },
-        { key: "4",  label: "Binary -> ASCII",       hint: "Enter 8-bit binary bytes.",                        example: "01001000 01100101 01101100 01101100 01101111" },
-        { key: "5",  label: "ASCII -> UTF-8 bytes",  hint: "Enter ASCII text.",                                example: "Hello" },
-        { key: "6",  label: "UTF-8 bytes -> ASCII",  hint: "Enter decimal byte values from 0 to 127.",         example: "72 101 108 108 111" },
-        { key: "7",  label: "ASCII -> Decimal",      hint: "Enter ASCII text.",                                example: "ABC" },
-        { key: "8",  label: "Decimal -> ASCII",      hint: "Enter decimal character values.",                 example: "65 66 67" },
-        { key: "9",  label: "UTF-8 -> Decimal",      hint: "Enter any UTF-8 text.",                            example: "cafe" },
-        { key: "10", label: "Decimal -> UTF-8",      hint: "Enter decimal bytes or one code point.",           example: "195 169" }
+        { key: "1",  label: "Decimal -> Binary",           hint: "Enter a non-negative whole number.",                    example: "42" },
+        { key: "2",  label: "Binary -> Decimal",           hint: "Enter binary digits. Spaces and commas are allowed.",   example: "101010" },
+        { key: "3",  label: "ASCII -> Binary",             hint: "Enter plain ASCII text.",                               example: "Hello" },
+        { key: "4",  label: "Binary -> ASCII",             hint: "Enter 8-bit binary bytes.",                             example: "01001000 01100101 01101100 01101100 01101111" },
+        { key: "5",  label: "ASCII -> UTF-8 bytes",        hint: "Enter ASCII text.",                                     example: "Hello" },
+        { key: "6",  label: "UTF-8 bytes -> ASCII",        hint: "Enter decimal byte values from 0 to 127.",              example: "72 101 108 108 111" },
+        { key: "7",  label: "ASCII -> Decimal",            hint: "Enter ASCII text.",                                     example: "ABC" },
+        { key: "8",  label: "Decimal -> ASCII",            hint: "Enter decimal character values.",                      example: "65 66 67" },
+        { key: "9",  label: "UTF-8 -> Decimal",            hint: "Enter any UTF-8 text.",                                 example: "cafe" },
+        { key: "10", label: "Decimal -> UTF-8",            hint: "Enter decimal bytes or one code point.",                example: "195 169" },
+        { key: "11", label: "Text -> Base64",              hint: "Enter any text.",                                      example: "Hello, World!" },
+        { key: "12", label: "Base64 -> Text",              hint: "Enter Base64-encoded text.",                           example: "SGVsbG8sIFdvcmxkIQ==" },
+        { key: "13", label: "Text -> Hex",                 hint: "Enter any text.",                                      example: "Hello" },
+        { key: "14", label: "Hex -> Text",                 hint: "Enter hex bytes. Spaces are optional.",                example: "48 65 6c 6c 6f" },
+        { key: "15", label: "URL Encode",                  hint: "Enter text or a URL to percent-encode.",               example: "hello world!" },
+        { key: "16", label: "URL Decode",                  hint: "Enter percent-encoded text.",                          example: "hello%20world%21" },
+        { key: "17", label: "Text -> Morse Code",          hint: "Enter letters, numbers, and basic punctuation.",       example: "SOS" },
+        { key: "18", label: "Morse Code -> Text",          hint: "Enter Morse code. Space between letters, / between words.", example: "... --- ..." },
+        { key: "19", label: "Text Length / Byte Counter",  hint: "Enter any text to count characters, words, bytes, and lines.", example: "Hello, World!" }
       ];
     </script>
   </head>
@@ -84,7 +93,7 @@
           <button id="clearHistoryButton" type="button">Clear</button>
         </div>
         <div class="history-list" id="historyList"></div>
-        <p class="shortcut-note">Ctrl+Enter converts. Escape clears.</p>
+        <p class="shortcut-note">Enter converts. Shift+Enter for a new line. Escape clears.</p>
       </aside>
     </main>
 

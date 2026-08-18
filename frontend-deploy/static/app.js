@@ -179,6 +179,16 @@ copyButton.addEventListener("click", copyOutput);
 clearHistoryButton.addEventListener("click", clearHistory);
 themeToggle.addEventListener("click", toggleTheme);
 
+// Enter converts (Shift+Enter still inserts a newline, same convention as
+// chat apps). Scoped to the input textarea only, so Enter elsewhere on the
+// page (e.g. inside the select) doesn't unexpectedly trigger a conversion.
+inputValue.addEventListener("keydown", (event) => {
+  if (event.key === "Enter" && !event.shiftKey) {
+    event.preventDefault();
+    convert();
+  }
+});
+
 document.addEventListener("keydown", (event) => {
   if (event.ctrlKey && event.key === "Enter") {
     convert();
