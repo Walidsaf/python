@@ -48,6 +48,25 @@ def binary_to_ascii(bits: str) -> str:
     return "".join(chars)
 
 
+# --- New: Text <-> Binary (full Unicode via UTF-8, unlike the ASCII-only pair above) ---
+
+def text_to_binary(text: str) -> list[str]:
+    return [format(byte, "08b") for byte in text.encode("utf-8")]
+
+
+def binary_to_text(bits: str) -> str:
+    cleaned = bits.replace(" ", "").replace(",", "")
+    if len(cleaned) % 8 != 0:
+        raise ValueError("Binary must be grouped into 8-bit bytes.")
+    byte_values = []
+    for i in range(0, len(cleaned), 8):
+        byte_values.append(int(cleaned[i : i + 8], 2))
+    try:
+        return bytes(byte_values).decode("utf-8")
+    except UnicodeDecodeError as error:
+        raise ValueError("This binary data is not valid UTF-8 text.") from error
+
+
 def ascii_to_utf8_bytes(text: str) -> list[int]:
     return list(text.encode("utf-8"))
 
@@ -373,6 +392,22 @@ CONVERSIONS: tuple[Conversion, ...] = (
         "Hello, World!",
         "Stats",
         text_stats,
+    ),
+    Conversion(
+        "20",
+        "Text -> Binary",
+        "Enter any text (full Unicode supported, not just ASCII).",
+        "Cafe \u2615",
+        "Binary bytes",
+        text_to_binary,
+    ),
+    Conversion(
+        "21",
+        "Binary -> Text",
+        "Enter 8-bit binary bytes (supports full Unicode/UTF-8, not just ASCII).",
+        "01000011 01100001 01100110 01100101 00100000 11100010 10011000 10010101",
+        "Text",
+        binary_to_text,
     ),
 )
 

@@ -1,6 +1,9 @@
 const conversions = window.CONVERSIONS || [];
 
-const conversionSelect = document.querySelector("#conversionSelect");
+const comboInput = document.querySelector("#conversionSearch");
+const comboList = document.querySelector("#conversionListbox");
+const comboBox = document.querySelector("#conversionCombobox");
+const sortToggle = document.querySelector("#sortToggle");
 const hintText = document.querySelector("#hintText");
 const inputValue = document.querySelector("#inputValue");
 const outputValue = document.querySelector("#outputValue");
@@ -15,11 +18,16 @@ const themeToggle = document.querySelector("#themeToggle");
 
 const historyKey = "encoding-explorer-history";
 const themeKey = "encoding-explorer-theme";
+const sortKey = "encoding-explorer-sort";
 
 let historyItems = loadHistory();
+let selectedConversion = conversions[0];
+let sortDirection = localStorage.getItem(sortKey) === "desc" ? "desc" : "asc";
+let filterText = "";
+let activeIndex = -1;
 
 function currentConversion() {
-  return conversions.find((conversion) => conversion.key === conversionSelect.value) || conversions[0];
+  return selectedConversion || conversions[0];
 }
 
 function setStatus(message, type = "success") {
@@ -28,15 +36,153 @@ function setStatus(message, type = "success") {
   statusText.classList.toggle("is-success", type !== "error");
 }
 
-function renderConversions() {
-  conversionSelect.innerHTML = "";
-  for (const conversion of conversions) {
-    const option = document.createElement("option");
-    option.value = conversion.key;
-    option.textContent = conversion.label;
-    conversionSelect.append(option);
+// --- Searchable / sortable conversion picker --------------------------------
+
+function getVisibleConversions() {
+  let list = [...conversions].sort((a, b) => a.label.localeCompare(b.label));
+  if (sortDirection === "desc") list.reverse();
+
+  const query = filterText.trim().toLowerCase();
+  if (query) {
+    list = list.filter(
+      (conversion) =>
+        conversion.label.toLowerCase().includes(query) || conversion.key === query
+    );
   }
+  return list;
 }
+
+function renderComboList() {
+  const list = getVisibleConversions();
+  comboList.innerHTML = "";
+
+  if (list.length === 0) {
+    const empty = document.createElement("li");
+    empty.className = "combobox-empty";
+    empty.textContent = "No matching conversions.";
+    comboList.append(empty);
+    activeIndex = -1;
+    return;
+  }
+
+  if (activeIndex >= list.length) activeIndex = list.length - 1;
+
+  list.forEach((conversion, index) => {
+    const option = document.createElement("li");
+    option.className = "combobox-option";
+    option.setAttribute("role", "option");
+    option.id = `combo-option-${conversion.key}`;
+    option.dataset.key = conversion.key;
+    if (index === activeIndex) option.classList.add("is-active");
+    if (selectedConversion && conversion.key === selectedConversion.key) {
+      option.classList.add("is-selected");
+      option.setAttribute("aria-selected", "true");
+    }
+    option.innerHTML = `<span class="option-key">#${conversion.key}</span><span class="option-label">${escapeHtml(conversion.label)}</span>`;
+    option.addEventListener("mousedown", (event) => {
+      event.preventDefault();
+      selectConversion(conversion);
+    });
+    comboList.append(option);
+  });
+}
+
+function openList() {
+  comboList.hidden = false;
+  comboInput.setAttribute("aria-expanded", "true");
+  renderComboList();
+}
+
+function closeList() {
+  comboList.hidden = true;
+  comboInput.setAttribute("aria-expanded", "false");
+  activeIndex = -1;
+}
+
+function selectConversion(conversion) {
+  selectedConversion = conversion;
+  comboInput.value = conversion.label;
+  filterText = "";
+  closeList();
+  updateHint();
+}
+
+function applySortDirection(direction) {
+  sortDirection = direction;
+  localStorage.setItem(sortKey, direction);
+  sortToggle.setAttribute("aria-label", direction === "asc" ? "Sorted A to Z. Click for Z to A." : "Sorted Z to A. Click for A to Z.");
+  sortToggle.title = sortToggle.getAttribute("aria-label");
+  sortToggle.querySelector("span").textContent = direction === "asc" ? "A→Z" : "Z→A";
+  if (!comboList.hidden) renderComboList();
+}
+
+comboInput.addEventListener("focus", () => {
+  filterText = "";
+  activeIndex = -1;
+  openList();
+  comboInput.select();
+});
+
+comboInput.addEventListener("input", () => {
+  filterText = comboInput.value;
+  activeIndex = 0;
+  openList();
+});
+
+comboInput.addEventListener("keydown", (event) => {
+  if (event.key === "ArrowDown") {
+    event.preventDefault();
+    if (comboList.hidden) {
+      openList();
+      return;
+    }
+    const list = getVisibleConversions();
+    activeIndex = Math.min(activeIndex + 1, list.length - 1);
+    renderComboList();
+    return;
+  }
+
+  if (event.key === "ArrowUp") {
+    event.preventDefault();
+    const list = getVisibleConversions();
+    activeIndex = Math.max(activeIndex - 1, 0);
+    renderComboList();
+    return;
+  }
+
+  if (event.key === "Enter") {
+    event.preventDefault();
+    event.stopPropagation();
+    const list = getVisibleConversions();
+    if (list[activeIndex]) {
+      selectConversion(list[activeIndex]);
+    } else if (list.length === 1) {
+      selectConversion(list[0]);
+    }
+    return;
+  }
+
+  if (event.key === "Escape") {
+    event.preventDefault();
+    event.stopPropagation();
+    filterText = "";
+    comboInput.value = currentConversion().label;
+    closeList();
+  }
+});
+
+sortToggle.addEventListener("click", () => {
+  applySortDirection(sortDirection === "asc" ? "desc" : "asc");
+});
+
+document.addEventListener("click", (event) => {
+  if (!comboBox.contains(event.target)) {
+    closeList();
+    comboInput.value = currentConversion().label;
+  }
+});
+
+// --- Core conversion logic ----------------------------------------------------
 
 function updateHint() {
   const conversion = currentConversion();
@@ -135,7 +281,11 @@ function renderHistory() {
     button.type = "button";
     button.innerHTML = `<strong>${escapeHtml(item.label)}</strong><span>${escapeHtml(item.input)} -> ${escapeHtml(item.output)}</span>`;
     button.addEventListener("click", () => {
-      conversionSelect.value = item.choice;
+      const conversion = conversions.find((c) => c.key === item.choice);
+      if (conversion) {
+        selectedConversion = conversion;
+        comboInput.value = conversion.label;
+      }
       inputValue.value = item.input;
       outputValue.value = item.output;
       updateHint();
@@ -171,7 +321,6 @@ function escapeHtml(value) {
     .replaceAll("'", "&#039;");
 }
 
-conversionSelect.addEventListener("change", updateHint);
 convertButton.addEventListener("click", convert);
 exampleButton.addEventListener("click", loadExample);
 clearButton.addEventListener("click", clearCurrent);
@@ -180,8 +329,7 @@ clearHistoryButton.addEventListener("click", clearHistory);
 themeToggle.addEventListener("click", toggleTheme);
 
 // Enter converts (Shift+Enter still inserts a newline, same convention as
-// chat apps). Scoped to the input textarea only, so Enter elsewhere on the
-// page (e.g. inside the select) doesn't unexpectedly trigger a conversion.
+// chat apps). Scoped to the input textarea only.
 inputValue.addEventListener("keydown", (event) => {
   if (event.key === "Enter" && !event.shiftKey) {
     event.preventDefault();
@@ -193,13 +341,15 @@ document.addEventListener("keydown", (event) => {
   if (event.ctrlKey && event.key === "Enter") {
     convert();
   }
-  if (event.key === "Escape") {
+  if (event.key === "Escape" && document.activeElement !== comboInput) {
     clearCurrent();
   }
 });
 
 applyTheme(localStorage.getItem(themeKey) || "light");
-renderConversions();
+applySortDirection(sortDirection);
+comboInput.value = selectedConversion.label;
+closeList();
 updateHint();
 loadExample();
 renderHistory();

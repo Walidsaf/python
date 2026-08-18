@@ -1,11 +1,11 @@
 # Encoding Explorer
 
-A Python converter app for decimal, binary, ASCII, and UTF-8. It runs as a desktop GUI, a terminal app, and a publicly deployed web app.
+A Python converter app for decimal, binary, ASCII, UTF-8, Base64, Hex, URL encoding, and Morse code. It runs as a desktop GUI, a terminal app, and a publicly deployed web app.
 
 **Live:** [citex.name.ng](https://citex.name.ng) (frontend, Netlify) → proxies to [python-v6nq.onrender.com](https://python-v6nq.onrender.com) (backend API, Render)
 
 ## Features
-* Decimal, binary, ASCII, and UTF-8 conversions
+* 19 conversion types: Decimal, Binary, ASCII, UTF-8, Base64, Hex, URL encoding/decoding, Morse code, and Text stats
 * Shared Python conversion engine in `converter.py`
 * Desktop GUI with examples, copy output, menu bar, dark mode, and saved history
 * Web app with HTML, CSS, JavaScript, dark mode, local history, and a Python API
@@ -60,7 +60,7 @@ Running locally this way serves both the API and the Jinja-rendered `templates/i
 ## Project Files
 * `app.py` - main launcher for desktop, terminal, and web modes
 * `test.py` - compatibility wrapper for the old run command
-* `converter.py` - shared conversion logic (single source of truth for all `CONVERSIONS`)
+* `converter.py` - shared conversion logic (single source of truth for all 19 `CONVERSIONS`)
 * `web_app.py` - Flask backend and API
 * `templates/index.html` - Jinja-rendered web page, used only when Flask serves the frontend itself (local dev / same-origin deploys)
 * `static/styles.css` - web design
@@ -92,6 +92,31 @@ frontend-deploy/
     └── app.js
 ```
 
+## Conversion Types (19 total)
+
+**Original (1-10):**
+1. Decimal → Binary
+2. Binary → Decimal
+3. ASCII → Binary
+4. Binary → ASCII
+5. ASCII → UTF-8 bytes
+6. UTF-8 bytes → ASCII
+7. ASCII → Decimal
+8. Decimal → ASCII
+9. UTF-8 → Decimal
+10. Decimal → UTF-8
+
+**New (11-19):**
+11. Text → Base64
+12. Base64 → Text
+13. Text → Hex
+14. Hex → Text
+15. URL Encode
+16. URL Decode
+17. Text → Morse Code
+18. Morse Code → Text
+19. Text Length / Byte Counter (stats)
+
 ## Web API
 The website connects to Python through:
 ```text
@@ -101,8 +126,8 @@ POST /api/convert
 Example JSON body:
 ```json
 {
-  "choice": "1",
-  "value": "42"
+  "choice": "11",
+  "value": "Hello, World!"
 }
 ```
 
@@ -110,11 +135,11 @@ Example response:
 ```json
 {
   "ok": true,
-  "result": "101010",
+  "result": "SGVsbG8sIFdvcmxkIQ==",
   "conversion": {
-    "key": "1",
-    "label": "Decimal -> Binary",
-    "outputLabel": "Binary"
+    "key": "11",
+    "label": "Text -> Base64",
+    "outputLabel": "Base64"
   }
 }
 ```
